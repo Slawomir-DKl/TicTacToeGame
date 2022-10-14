@@ -25,7 +25,7 @@ def enter_move(board):  # User's move & board update
             move = int(input("Please enter number of square to put your mark: "))
             # Checking if number is > 0
             if move <= 0:
-                chk = move / (move - move)
+                chk = move / (move - move) # Generating ZeroDivisionError
             # Calculating row and column @
             if move % 3 == 0:
                 r = (move - move % 3) // 3 - 1
@@ -38,7 +38,7 @@ def enter_move(board):  # User's move & board update
                 board[r][c] = "O"
                 break
             else:
-                chk = nofunct
+                chk = nofunct #non-existing function to generate the ValueError
         except ValueError:
             print("It is not an integer!")
         except NameError:
@@ -60,7 +60,7 @@ def make_list_of_free_fields(board):  # Building list of all the free squares
     return free
 
 
-def victory_for(board, sign):  # Checking if anyone won
+def victory_check(board, sign, towin):  # Checking if anyone has [towin] number of hits in a row (if not needed for winning algorithm, delete towin)
 
     win = 0
     # Check for horizontal win
@@ -68,7 +68,7 @@ def victory_for(board, sign):  # Checking if anyone won
         for y in range(3):
             if board[x][y] == sign:
                 win += 1
-        if win == 3:
+        if win == towin:
             return "win"
         else:
             win = 0
@@ -77,7 +77,7 @@ def victory_for(board, sign):  # Checking if anyone won
         for y in range(3):
             if board[y][x] == sign:
                 win += 1
-        if win == 3:
+        if win == towin:
             return "win"
         else:
             win = 0
@@ -85,7 +85,7 @@ def victory_for(board, sign):  # Checking if anyone won
     for x in range(3):
         if board[x][x] == sign:
             win += 1
-    if win == 3:
+    if win == towin:
         return "win"
     else:
         win = 0
@@ -96,7 +96,7 @@ def victory_for(board, sign):  # Checking if anyone won
         win += 1
     if board[2][0] == sign:
         win += 1
-    if win == 3:
+    if win == towin:
         return "win"
     return "next"
 
@@ -140,16 +140,40 @@ while True:
     # User move
     enter_move(board)
     display_board(board)
-    if victory_for(board, "O") == "win":
+    if victory_check(board, "O", 3) == "win":
         print("You won")
         break
     print("Next computer move")
     # Computer move
     draw_move(board)
     display_board(board)
-    if victory_for(board, "X") == "win":
+    if victory_check(board, "X", 3) == "win":
         print("Computer won")
         break
     if len(make_list_of_free_fields(board)) == 0:
         print("Draw")
         break
+
+# Implementation of winning algorithm acc. to:
+# https://swistak.codes/post/algorytmika-gier-kolko-i-krzyzyk/#strategia-wygrywania-w-kółko-i-krzyżyk
+# on the basis of https://onlinelibrary.wiley.com/doi/abs/10.1207/s15516709cog1704_3
+
+# 1. Winning move - if you have two checked fields in a row and the third field is empty, check the third one and win
+win = 0
+los = 0
+# Check for horizontal win
+for x in range(3):
+    for y in range(3):
+        if board[x][y] == "X":
+            win += 1
+        elif board[x][y] == "O":
+            los += 1
+        else:
+            pass
+            # Memorize the free field
+    if win == 2 and los == 0:
+        pass
+        # Enter your mark to the free field
+    else:
+        win = 0
+        los = 0
