@@ -100,16 +100,41 @@ def victory_check(board, sign, towin):  # Checking if anyone has [towin] number 
         return "win"
     return "next"
 
+def win_alg(board):
+    # 1. Winning move - if you have two checked fields in a row and the third field is empty, check the third one and win
+    # Attempt for horizontal win / horizontal defence
+    # !!! Algorithms have to be separate for win and separate for defence - defence is done only after all win possibility checks.
+    # !!! Maybe additional function argument - win/def - defining what we will do
+    for x in range(3):
+        row = []
+        win = 0
+        for y in range(3):
+            if board[x][y] == "X":
+                row.append(1)
+                win += 1
+            elif board[x][y] == "O":
+                row.append(0)
+        if len(row) == 2: # We're interested only in rows with 2 values
+            if win == 2: # Computer has 2 in the row, user has 0 - winning movement
+                for y in range(3):
+                    if board[x][y] not in ["X", "O"]:
+                        board[x][y] = "X"
+                        return "ok"
+            elif win == 0: # User has 2 in the row, computer has 0 - defence
+                for y in range(3):
+                    if board[x][y] not in ["X", "O"]:
+                        board[x][y] = "X"
+                        return "ok"
 
 def draw_move(board):  # Computer's move & board update
-
-    from random import randrange
-    free_fields = make_list_of_free_fields(board)
-    comp_move = randrange(len(free_fields))
-    field = free_fields[comp_move]  # tuple containing coordinates of computer move
-    x = field[0]
-    y = field[1]
-    board[x][y] = "X"
+    if win_alg(board) != "ok":
+        from random import randrange
+        free_fields = make_list_of_free_fields(board)
+        comp_move = randrange(len(free_fields))
+        field = free_fields[comp_move]  # tuple containing coordinates of computer move
+        x = field[0]
+        y = field[1]
+        board[x][y] = "X"
 
 
 # Initialization - empty board - list [row][column]
@@ -157,23 +182,3 @@ while True:
 # Implementation of winning algorithm acc. to:
 # https://swistak.codes/post/algorytmika-gier-kolko-i-krzyzyk/#strategia-wygrywania-w-kółko-i-krzyżyk
 # on the basis of https://onlinelibrary.wiley.com/doi/abs/10.1207/s15516709cog1704_3
-
-# 1. Winning move - if you have two checked fields in a row and the third field is empty, check the third one and win
-win = 0
-los = 0
-# Check for horizontal win
-for x in range(3):
-    for y in range(3):
-        if board[x][y] == "X":
-            win += 1
-        elif board[x][y] == "O":
-            los += 1
-        else:
-            pass
-            # Memorize the free field
-    if win == 2 and los == 0:
-        pass
-        # Enter your mark to the free field
-    else:
-        win = 0
-        los = 0
