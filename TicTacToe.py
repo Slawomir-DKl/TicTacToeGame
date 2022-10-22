@@ -65,7 +65,9 @@ def victory_check(board, sign, towin):  # Checking if anyone has [towin] number 
     for i in range(len(triples)):
         win = 0
         for j in range(3):
-            if board[triples[i][j][0]][triples[i][j][1]] == sign:
+            x = triples[i][j][0] #Coordinates of the checked field
+            y = triples[i][j][1]
+            if board[x][y] == sign:
                 win += 1
         if win == towin:
             return "win"
@@ -73,35 +75,36 @@ def victory_check(board, sign, towin):  # Checking if anyone has [towin] number 
             win = 0
     return "next"
 
-def win_alg(board):
-    # 1. Winning move - if you have two checked fields in a row and the third field is empty, check the third one and win
-    # Attempt for horizontal win / horizontal defence
-    # !!! Algorithms have to be separate for win and separate for defence - defence is done only after all win possibility checks.
-    # !!! Maybe additional function argument - win/def - defining what we will do
-    for x in range(3):
-        row = []
-        win = 0
-        for y in range(3):
+def win_block(board, xwin, owin): # if there are two identically checked fields in a row and the third field is empty, check the third one and win or block
+    for i in range(len(triples)):
+        xfld = 0
+        ofld = 0
+        for j in range(3):
+            x = triples[i][j][0] #Coordinates of the checked field
+            y = triples[i][j][1]
             if board[x][y] == "X":
-                row.append(1)
-                win += 1
-#                print(row, win)
+                xfld += 1
             elif board[x][y] == "O":
-                row.append(0)
-#                print(row, win)
-        if len(row) == 2: # We're interested only in rows with 2 values
-            if win == 2: # Computer has 2 in the row, user has 0 - winning movement
-                for y in range(3):
-                    if board[x][y] not in ["X", "O"]:
-                        board[x][y] = "X"
-#                        print(row, win, "x = ", x, "y = ", y)
-                        return "ok"
- #           elif win == 0: # User has 2 in the row, computer has 0 - defense
- #               for y in range(3):
- #                   if board[x][y] not in ["X", "O"]:
- #                       board[x][y] = "X"
- #                       print(row, win, "ok")
- #                       return "ok"
+                ofld += 1
+        if xfld == xwin and ofld == owin: # Computer has 2 in the row, user has 0 - winning movement
+            for j in range(3):
+                x = triples[i][j][0]
+                y = triples[i][j][1]
+                if board[x][y] not in ["X", "O"]:
+                    board[x][y] = "X"
+                    return "ok"
+
+def win_alg(board):
+    # Implementation of winning algorithm acc. to:
+    # https://swistak.codes/post/algorytmika-gier-kolko-i-krzyzyk/#strategia-wygrywania-w-kółko-i-krzyżyk
+    # on the basis of https://onlinelibrary.wiley.com/doi/abs/10.1207/s15516709cog1704_3
+    # 1. Winning move - if the computer has two checked fields in a row and the third field is empty, check the third one and win
+    if win_block(board, 2, 0) == "ok":
+        return "ok"
+    # 2. Block - if the opponent has two checked fields in a row and the third field is empty, check the third one and block the opponent
+    if win_block(board, 0, 2) == "ok":
+        return "ok"
+
 
 def draw_move(board):  # Computer's move & board update
     if win_alg(board) != "ok":
@@ -161,7 +164,5 @@ while True:
         print("Draw")
         break
 
-# Implementation of winning algorithm acc. to:
-# https://swistak.codes/post/algorytmika-gier-kolko-i-krzyzyk/#strategia-wygrywania-w-kółko-i-krzyżyk
-# on the basis of https://onlinelibrary.wiley.com/doi/abs/10.1207/s15516709cog1704_3
+
 
