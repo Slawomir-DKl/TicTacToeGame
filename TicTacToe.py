@@ -1,3 +1,6 @@
+from random import randrange
+
+
 def display_board(board):  # Printing the current board
 
     # Board layout elements
@@ -24,7 +27,7 @@ def enter_move(board):  # User's move & board update
             move = int(input("Please enter number of square to put your mark: "))
             # Checking if number is > 0
             if move <= 0:
-                chk = move / (move - move) # Generating ZeroDivisionError
+                chk = move / (move - move)  # Generating ZeroDivisionError
             # Calculating row and column @
             if move % 3 == 0:
                 r = (move - move % 3) // 3 - 1
@@ -37,7 +40,7 @@ def enter_move(board):  # User's move & board update
                 board[r][c] = "O"
                 break
             else:
-                chk = nofunct #non-existing function to generate the ValueError
+                chk = nofunct  # non-existing function to generate the ValueError
         except ValueError:
             print("It is not an integer!")
         except NameError:
@@ -59,13 +62,14 @@ def make_list_of_free_fields(board):  # Building list of all the free squares
     return free
 
 
-def victory_check(board, sign, towin):  # Checking if anyone has [towin] number of hits in a row (if not needed for winning algorithm, delete towin)
+def victory_check(board, sign, towin):  # Checking if anyone has [towin] number of hits in a row (if not needed for
+    # winning algorithm, delete towin)
 
     # Checking for win in any triple
     for i in range(len(triples)):
         win = 0
         for j in range(3):
-            x = triples[i][j][0] #Coordinates of the checked field
+            x = triples[i][j][0]  # Coordinates of the checked field
             y = triples[i][j][1]
             if board[x][y] == sign:
                 win += 1
@@ -75,7 +79,8 @@ def victory_check(board, sign, towin):  # Checking if anyone has [towin] number 
             win = 0
     return "next"
 
-def count_xo(board, i): #counting marked fields in a line
+
+def count_xo(board, i):  # counting marked fields in a line
 
     xfld = 0
     ofld = 0
@@ -88,16 +93,20 @@ def count_xo(board, i): #counting marked fields in a line
             ofld += 1
     return xfld, ofld
 
-def win_block(board, xwin, owin): # if there are two identically checked fields in a row and the third field is empty, check the third one and win or block
+
+def win_block(board, xwin, owin):  # if there are two identically checked fields in a row and the third field is empty,
+    # check the third one and win or block
     for i in range(len(triples)):
         xfld, ofld = count_xo(board, i)
-        if xfld == xwin and ofld == owin: # Computer has 2 in the row, user has 0 - winning movement; computer has 0 in the row, user has 2 - blocking movement
+        if xfld == xwin and ofld == owin:  # Computer has 2 in the row, user has 0 - winning movement; computer has 0
+            # in the row, user has 2 - blocking movement
             for j in range(3):
                 x = triples[i][j][0]
                 y = triples[i][j][1]
                 if board[x][y] not in ["X", "O"]:
                     board[x][y] = "X"
                     return "ok"
+
 
 def win_alg(board):
     # Implementation of winning algorithm acc. to:
@@ -116,11 +125,11 @@ def win_alg(board):
     # (to create two possibilities to win in the next move)
     for i in range(len(triples)):
         xfld, ofld = count_xo(board, i)
-        if xfld == 1 and ofld == 0: # first line with 1 computer mark and 0 user marks
-            for k in range(len(intersections[i])): # checking all intersecting lines
-                l = intersections[i][k] # number of intersecting line to check
+        if xfld == 1 and ofld == 0:  # first line with 1 computer mark and 0 user marks
+            for k in range(len(intersections[i])):  # checking all intersecting lines
+                l = intersections[i][k]  # number of intersecting line to check
                 xfldint, ofldint = count_xo(board, l)
-                if xfldint == 1 and ofldint == 0: # intersecting line with 1 computer mark and 0 user marks
+                if xfldint == 1 and ofldint == 0:  # intersecting line with 1 computer mark and 0 user marks
                     for n in range(3):
                         for o in range(3):
                             if triples[i][n] == triples[l][o]:
@@ -130,11 +139,37 @@ def win_alg(board):
                                     board[x][y] = "X"
                                     return "ok"
     return
-
     # 4. Do a blocking fork - if you have two intersecting lines (horizontal, vertical, diagonal) with one opponent mark
     # and with two empty places AND if the intersection of the lines is empty, then: if there is empty place which would
-    # create two marks in a row for me (that the opponent has to block in his next move) - insert your mark in this place
+    # create two marks in a row for me (that the opponent has to block in his next move)
+    # - insert your mark in this place
     # else: insert your mark in the intersection (to block two possibilities to win for the opponent in the next move)
+
+    for i in range(len(triples)):
+        xfld, ofld = count_xo(board, i)
+        if xfld == 1 and ofld == 0:  # first line with 1 computer mark and 0 user marks
+            for k in range(len(intersections[i])):  # checking all intersecting lines
+                l = intersections[i][k]  # number of intersecting line to check
+                xfldint, ofldint = count_xo(board, l)
+                if xfldint == 0 and ofldint == 1:  # intersecting line with 0 computer mark and 1 user marks
+                    # To do: I think the algorithm has to be changed a little to avoid situation when after creating
+                    # two own marks in a row, the opponent blocks it by inserting its mark in the intersection
+                    # Example: X--/--X/-O- if computer put its mark O: X--/--X/OO-, the opponent can do a winning fork:
+                    # X--/--X/OOX
+                    # So in such situation alg. have to check if there is a possibility to insert such mark
+                    # in intersection, then if it can be placed out of intersection
+                    # then marks the intersection without creating two in a row
+                    for p in range(len(triples)):  # To do: Here next - something wrong here
+                        xint, oint = count_xo(board, p)
+                        if xint == 1 and oint == 0:  # line to put 2nd mark
+                            for n in range(3):  # Checking empty intersection there
+                                for o in range(3):
+                                    if triples[p][n] == triples[l][o]:
+                                        x = triples[p][n][0]  # Coordinates of the checked field
+                                        y = triples[p][n][1]
+                                        if board[x][y] not in ("O", "X"):
+                                            board[x][y] = "X"
+                                            return "ok"
 
     # 5. Use the center - if the center field is empty, insert your mark here
 
@@ -144,6 +179,8 @@ def win_alg(board):
     # 7. Occupy the empty corner - if there is an empty corner, insert your mark here
 
     # 8. Play on the empty side - if there is an empty side field, insert your mark here
+
+
 
 def draw_move(board):  # Computer's move & board update
     if win_alg(board) != "ok":
@@ -168,23 +205,48 @@ row = [x for x in range(7, 10)]
 board.append(row)
 display_board(board)
 
+# List of all fields
+fields = ((0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2))
+
 # List of all possible 3-field lines
 triples = (((0, 0), (0, 1), (0, 2)), ((1, 0), (1, 1), (1, 2)), ((2, 0), (2, 1), (2, 2)), ((0, 0), (1, 0), (2, 0)),
            ((0, 1), (1, 1), (2, 1)), ((0, 2), (1, 2), (2, 2)), ((0, 0), (1, 1), (2, 2)), ((2, 0), (1, 1), (0, 2)))
-# All possible intersecting lines in relation to triples
+# All possible intersecting lines in relation to triples, i.e. line 0 intersects with lines 3, 4, 5, 6, 7 etc.
+# Only one check of any line pair
 intersections = ((3, 4, 5, 6, 7), (3, 4, 5, 6, 7), (3, 4, 5, 6, 7), (6, 7), (6, 7), (6, 7), (7,),
                  ())
-# Randomly selecting who starts
-from random import randrange
-
-who = randrange(2)
-if who == 0:
-    compsign = "X"
-    print("Computer begins and plays with X")
-    draw_move(board)  # First computer move is also algorythmised
-else:
-    compsign = "O"
-    print("You begin and play with O")
+# 4dev: to delete after finishing the program - without error management as it is for dev only
+enter_initial = input("Enter Y if you want to enter initial positions: ")
+if enter_initial == "Y":
+    while True:
+        fldno = int(input("Enter number of the field with computer X mark or enter 0 (zero) to stop entering: ")) - 1
+        if fldno == -1:
+            break
+        else:
+            selected_fld = fields[fldno]
+            board[selected_fld[0]][selected_fld[1]] = "X"
+            display_board(board)
+    while True:
+        fldno = int(input("Enter number of the field with user O mark or enter 0 (zero) to stop entering: ")) - 1
+        if fldno == -1:
+            break
+        else:
+            selected_fld = fields[fldno]
+            board[selected_fld[0]][selected_fld[1]] = "O"
+            display_board(board)
+    select_starter = int(input("Select who begins. Enter 1 if computer or 0 if user"))
+    if select_starter == 1:
+        draw_move(board)  # First computer move is also algorythmised
+else:  # here begins the part to leave in the final program
+    # Randomly selecting who starts
+    who = randrange(2)
+    if who == 0:
+        compsign = "X"
+        print("Computer begins and plays with X")
+        draw_move(board)  # First computer move is also algorythmised
+    else:
+        compsign = "O"
+        print("You begin and play with O")
 display_board(board)
 
 # Actual play
@@ -205,6 +267,3 @@ while True:
     if len(make_list_of_free_fields(board)) == 0:
         print("Draw")
         break
-
-
-
