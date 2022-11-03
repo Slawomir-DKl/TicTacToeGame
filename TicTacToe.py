@@ -186,16 +186,41 @@ def win_alg(fnboard):
                                                     return "ok"
                                     fnboard[xint][yint] = "X"  # Placing mark in the intersection
                                     return "ok"
-    return
+
     # 5. Use the center - if the center field is empty, insert your mark here
+    if fnboard[1][1] not in ("O", "X"):
+        fnboard[1][1] = "X"
+        return "ok"
 
     # 6. Play the opposite corner - if the opponent has its mark in the corner and the opposite corner is empty,
     # insert your mark in the opposite corner
-
+    corners = ((0, 0), (0, 2), (2, 0), (2, 2))
+    opposite = ((2, 2), (2, 0), (0, 2), (0, 0))
+    for corner in range(len(corners)):
+        xcorn = corners[corner][0]
+        ycorn = corners[corner][1]
+        if fnboard[xcorn][ycorn] == "O":
+            xopp = opposite[corner][0]
+            yopp = opposite[corner][1]
+            if fnboard[xopp][yopp] not in ("O", "X"):
+                fnboard[xopp][yopp] = "X"
+                return "ok"
     # 7. Occupy the empty corner - if there is an empty corner, insert your mark here
-
+    for corner in range(len(corners)):
+        xcorn = corners[corner][0]
+        ycorn = corners[corner][1]
+        if fnboard[xcorn][ycorn] not in ("O", "X"):
+                fnboard[xcorn][ycorn] = "X"
+                return "ok"
     # 8. Play on the empty side - if there is an empty side field, insert your mark here
-
+    sides = ((0, 1), (1, 0), (1, 2), (2, 1))
+    for side in range(len(sides)):
+        xside = sides[side][0]
+        yside = sides[side][1]
+        if fnboard[xside][yside] not in ("O", "X"):
+                fnboard[xside][yside] = "X"
+                return "ok"
+    return
 
 def draw_move(fnboard):  # Computer's move & board update
     if win_alg(fnboard) != "ok":
