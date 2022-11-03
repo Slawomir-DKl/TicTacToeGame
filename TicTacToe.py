@@ -127,50 +127,66 @@ def win_alg(fnboard):
         xfld, ofld = count_xo(fnboard, triple)
         if xfld == 1 and ofld == 0:  # first line with 1 computer mark and 0 user marks
             for interfield in range(len(intersections[triple])):  # checking all intersecting lines
-                line_check = intersections[triple][interfield]  # number of intersecting line to check
-                xfldint, ofldint = count_xo(fnboard, line_check)
+                interline = intersections[triple][interfield]  # number of intersecting line to check
+                xfldint, ofldint = count_xo(fnboard, interline)
                 if xfldint == 1 and ofldint == 0:  # intersecting line with 1 computer mark and 0 user marks
                     for field in range(3):
                         for lcheckfield in range(3):
-                            if triples[triple][field] == triples[line_check][lcheckfield]:
-                                x = triples[triple][field][0]  # Coordinates of the checked field
+                            if triples[triple][field] == triples[interline][lcheckfield]:
+                                x = triples[triple][field][0]  # Coordinates of the intersection
                                 y = triples[triple][field][1]
                                 if fnboard[x][y] not in ("O", "X"):
                                     fnboard[x][y] = "X"
                                     return "ok"
-    return
+
     # 4. Do a blocking fork if you have two intersecting lines (horizontal, vertical, diagonal) with one opponent mark
     # and with two empty places AND if the intersection of the lines is empty, then:
-    # if there is empty place which would create two marks in a row for computer (that the opponent has to block
-    # in his next move) - insert your mark in this place
+    # if the intersection would create two marks in a row for computer (that the opponent has to block
+    # in his next move) - insert your mark in the intersection
+    # else: if there is other empty place which would create two marks in a row for computer (that the opponent has
+    # to block in his next move) - insert your mark in this empty place
     # else: insert your mark in the intersection (to block two possibilities to win for the opponent in the next move)
 
     for triple in range(len(triples)):
         xfld, ofld = count_xo(fnboard, triple)
         if xfld == 0 and ofld == 1:  # first line with 0 computer marks and 1 user mark
+            print("first line 0/1", triple)
             for interfield in range(len(intersections[triple])):  # checking all intersecting lines
-                line_check = intersections[triple][interfield]  # number of intersecting line to check
-                xfldint, ofldint = count_xo(fnboard, line_check)
+                interline = intersections[triple][interfield]  # number of intersecting line to check
+                xfldint, ofldint = count_xo(fnboard, interline)
                 if xfldint == 0 and ofldint == 1:  # intersecting line with 0 computer mark and 1 user marks
-                    # To do: I think the algorithm has to be changed a little to avoid situation when after creating
-                    # two own marks in a row, the opponent blocks it by inserting its mark in the intersection
-                    # Example: X--/--X/-O- if computer put its mark O: X--/--X/OO-, the opponent can do a winning fork:
-                    # X--/--X/OOX
-                    # So in such situation alg. have to check if there is a possibility to insert such mark
-                    # in intersection, then if it can be placed out of intersection
-                    # then marks the intersection without creating two in a row
-                    for p in range(len(triples)):  # To do: something wrong here
-                        xint, oint = count_xo(fnboard, p)
-                        if xint == 1 and oint == 0:  # line to put 2nd mark
-                            for n in range(3):  # Checking empty intersection there
-                                for o in range(3):
-                                    if triples[p][n] == triples[line_check][o]:
-                                        x = triples[p][n][0]  # Coordinates of the checked field
-                                        y = triples[p][n][1]
-                                        if fnboard[x][y] not in ("O", "X"):
-                                            fnboard[x][y] = "X"
-                                            return "ok"
-
+                    print("intersection 0/1", interfield, interline)
+                    xint = 9
+                    yint = 9
+                    for field in range(3):  # Finding the intersection coordinates
+                        for lcheckfield in range(3):
+                            if triples[triple][field] == triples[interline][lcheckfield]:
+                                print(field, lcheckfield)
+                                xint = triples[triple][field][0]  # Coordinates of the intersection
+                                yint = triples[triple][field][1]
+                                if fnboard[xint][yint] not in ("O", "X"):  # TO DO - Y106701
+                                    print(xint, yint)
+                                    for chktriple in range(len(triples)):  # Checking if intersection creates two-in-a-row for comp.
+                                        for chkfield in range(3):
+                                            xchk = triples[chktriple][chkfield][0]
+                                            ychk = triples[chktriple][chkfield][1]
+                                            if xchk == xint and ychk == yint:
+                                                xfldchk, ofldchk = count_xo(fnboard, chktriple)
+                                                if xfldchk == 1 and ofldchk == 0:
+                                                    fnboard[xint][yint] = "X"
+                                                    return "ok"
+                                    for sngltriple in range(len(triples)):  # Finding any line with single comp mark
+                                        xsngl, osngl = count_xo(fnboard, sngltriple)
+                                        if xsngl == 1 and osngl == 0:
+                                            for snglfield in range(3):
+                                                xsn = triples[sngltriple][snglfield][0]
+                                                ysn = triples[sngltriple][snglfield][1]
+                                                if fnboard[xsn][ysn] not in ("O", "X"):
+                                                    fnboard[xsn][ysn] = "X"
+                                                    return "ok"
+                                    fnboard[xint][yint] = "X"  # Placing mark in the intersection
+                                    return "ok"
+    return
     # 5. Use the center - if the center field is empty, insert your mark here
 
     # 6. Play the opposite corner - if the opponent has its mark in the corner and the opposite corner is empty,
