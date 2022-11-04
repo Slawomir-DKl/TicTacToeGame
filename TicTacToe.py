@@ -149,20 +149,21 @@ def win_alg(fnboard):  # Implementation of winning algorithm
     for triple in range(len(triples)):
         xfld, ofld = count_xo(fnboard, triple)
         if xfld == 0 and ofld == 1:  # first line with 0 computer marks and 1 user mark
-            print("first line 0/1", triple)
+            print("first line ", triple)
             for interfield in range(len(intersections[triple])):  # checking all intersecting lines
                 interline = intersections[triple][interfield]  # number of intersecting line to check
                 xfldint, ofldint = count_xo(fnboard, interline)
                 if xfldint == 0 and ofldint == 1:  # intersecting line with 0 computer mark and 1 user marks
-                    print("intersection 0/1", interfield, interline)
+                    print("intersection ", interline)
                     for field in range(3):  # Finding the intersection coordinates
                         for lcheckfield in range(3):
-                            if triples[triple][field] == triples[interline][lcheckfield]:
-                                print(field, lcheckfield)
-                                xint = triples[triple][field][0]  # Coordinates of the intersection
-                                yint = triples[triple][field][1]
-                                if fnboard[xint][yint] not in ("O", "X"):  # TODO - Y106701
-                                    print(xint, yint)
+                            xint = triples[triple][field][0]  # Coordinates of the intersection
+                            yint = triples[triple][field][1]
+                            print(fnboard[xint][yint])
+                            if (triples[triple][field] == triples[interline][lcheckfield]):  # and (fnboard[xint][yint] not in ("O", "X")):   TODO - bug - compares also a field to itself
+                                print("compare [", triple, "][", field, "] with [", interline, "][", lcheckfield, "]")
+                                if fnboard[xint][yint] not in ("O", "X"):  # TODO - Y105901
+                                    print("empty field ", xint, yint)
                                     for chktriple in range(len(triples)):  # Check if inters. creates 2-in-a-row for X
                                         for chkfield in range(3):
                                             xchk = triples[chktriple][chkfield][0]
@@ -173,6 +174,7 @@ def win_alg(fnboard):  # Implementation of winning algorithm
                                                     fnboard[xint][yint] = "X"
                                                     return "ok"
                                     for sngltriple in range(len(triples)):  # Finding any line with single comp mark
+                                        # TODO problem - rethink if this should be after checking all possible intersection for the previous part?
                                         xsngl, osngl = count_xo(fnboard, sngltriple)
                                         if xsngl == 1 and osngl == 0:
                                             for snglfield in range(3):
