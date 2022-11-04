@@ -108,18 +108,18 @@ def win_block(fnboard, xwin, owin):  # if there are two identically checked fiel
                     return "ok"
 
 
-def win_alg(fnboard):
-    # Implementation of winning algorithm acc. to:
-    # https://swistak.codes/post/algorytmika-gier-kolko-i-krzyzyk/#strategia-wygrywania-w-kółko-i-krzyżyk
-    # on the basis of https://onlinelibrary.wiley.com/doi/abs/10.1207/s15516709cog1704_3
+def win_alg(fnboard):  # Implementation of winning algorithm
+
     # 1. Winning move - if the computer has two checked fields in a row and the third field is empty,
     # check the third one and win
     if win_block(fnboard, 2, 0) == "ok":
         return "ok"
+
     # 2. Block - if the opponent has two checked fields in a row and the third field is empty,
     # check the third one and block the opponent
     if win_block(fnboard, 0, 2) == "ok":
         return "ok"
+
     # 3. Do a fork - if you have two intersecting lines (horizontal, vertical, diagonal) with one your mark and with two
     # empty places AND if the intersection of the lines is empty, insert your mark in the intersection
     # (to create two possibilities to win in the next move)
@@ -146,7 +146,6 @@ def win_alg(fnboard):
     # else: if there is other empty place which would create two marks in a row for computer (that the opponent has
     # to block in his next move) - insert your mark in this empty place
     # else: insert your mark in the intersection (to block two possibilities to win for the opponent in the next move)
-
     for triple in range(len(triples)):
         xfld, ofld = count_xo(fnboard, triple)
         if xfld == 0 and ofld == 1:  # first line with 0 computer marks and 1 user mark
@@ -156,17 +155,15 @@ def win_alg(fnboard):
                 xfldint, ofldint = count_xo(fnboard, interline)
                 if xfldint == 0 and ofldint == 1:  # intersecting line with 0 computer mark and 1 user marks
                     print("intersection 0/1", interfield, interline)
-                    xint = 9
-                    yint = 9
                     for field in range(3):  # Finding the intersection coordinates
                         for lcheckfield in range(3):
                             if triples[triple][field] == triples[interline][lcheckfield]:
                                 print(field, lcheckfield)
                                 xint = triples[triple][field][0]  # Coordinates of the intersection
                                 yint = triples[triple][field][1]
-                                if fnboard[xint][yint] not in ("O", "X"):  # TO DO - Y106701
+                                if fnboard[xint][yint] not in ("O", "X"):  # TODO - Y106701
                                     print(xint, yint)
-                                    for chktriple in range(len(triples)):  # Checking if intersection creates two-in-a-row for comp.
+                                    for chktriple in range(len(triples)):  # Check if inters. creates 2-in-a-row for X
                                         for chkfield in range(3):
                                             xchk = triples[chktriple][chkfield][0]
                                             ychk = triples[chktriple][chkfield][1]
@@ -205,22 +202,26 @@ def win_alg(fnboard):
             if fnboard[xopp][yopp] not in ("O", "X"):
                 fnboard[xopp][yopp] = "X"
                 return "ok"
+
     # 7. Occupy the empty corner - if there is an empty corner, insert your mark here
     for corner in range(len(corners)):
         xcorn = corners[corner][0]
         ycorn = corners[corner][1]
         if fnboard[xcorn][ycorn] not in ("O", "X"):
-                fnboard[xcorn][ycorn] = "X"
-                return "ok"
+            fnboard[xcorn][ycorn] = "X"
+            return "ok"
+
     # 8. Play on the empty side - if there is an empty side field, insert your mark here
     sides = ((0, 1), (1, 0), (1, 2), (2, 1))
     for side in range(len(sides)):
         xside = sides[side][0]
         yside = sides[side][1]
         if fnboard[xside][yside] not in ("O", "X"):
-                fnboard[xside][yside] = "X"
-                return "ok"
+            fnboard[xside][yside] = "X"
+            return "ok"
+
     return
+
 
 def draw_move(fnboard):  # Computer's move & board update
     if win_alg(fnboard) != "ok":
@@ -251,11 +252,13 @@ fields = ((0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2)
 # List of all possible 3-field lines
 triples = (((0, 0), (0, 1), (0, 2)), ((1, 0), (1, 1), (1, 2)), ((2, 0), (2, 1), (2, 2)), ((0, 0), (1, 0), (2, 0)),
            ((0, 1), (1, 1), (2, 1)), ((0, 2), (1, 2), (2, 2)), ((0, 0), (1, 1), (2, 2)), ((2, 0), (1, 1), (0, 2)))
+
 # All possible intersecting lines in relation to triples, i.e. line 0 intersects with lines 3, 4, 5, 6, 7 etc.
 # Only one check of any line pair
 intersections = ((3, 4, 5, 6, 7), (3, 4, 5, 6, 7), (3, 4, 5, 6, 7), (6, 7), (6, 7), (6, 7), (7,),
                  ())
-# 4dev: to delete after finishing the program - without error management as it is for dev only
+
+# TODO: delete this part after finishing the program - setting initial positions is for dev only
 enter_initial = input("Enter Y if you want to enter initial positions: ")
 if enter_initial == "Y":
     while True:
@@ -290,6 +293,7 @@ else:  # here begins the part to leave in the final program
 display_board(board)
 
 # Actual play
+# TODO: Level selection - maybe on the basis of random numbers
 while True:
     # User move
     enter_move(board)
