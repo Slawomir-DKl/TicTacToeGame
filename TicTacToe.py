@@ -174,7 +174,7 @@ def win_alg(fnboard):  # Implementation of winning algorithm
                                                     fnboard[xint][yint] = "X"
                                                     return "ok"
                                     for sngltriple in range(len(triples)):  # Finding any line with single comp mark
-                                        # TODO problem - rethink if this should be after checking all possible intersection for the previous part?
+                                        # TODO problem - rethink if this should be after checking all possible intersections for the previous part?
                                         xsngl, osngl = count_xo(fnboard, sngltriple)
                                         if xsngl == 1 and osngl == 0:
                                             for snglfield in range(3):
@@ -206,21 +206,33 @@ def win_alg(fnboard):  # Implementation of winning algorithm
                 return "ok"
 
     # 7. Occupy the empty corner - if there is an empty corner, insert your mark here
+    corn = []
     for corner in range(len(corners)):
         xcorn = corners[corner][0]
         ycorn = corners[corner][1]
         if fnboard[xcorn][ycorn] not in ("O", "X"):
-            fnboard[xcorn][ycorn] = "X"
-            return "ok"
+            corn.append(corner)
+    if len(corn) > 0:
+        selected_corn = randrange(len(corn))
+        xcorn = corners[corn[selected_corn]][0]
+        ycorn = corners[corn[selected_corn]][1]
+        fnboard[xcorn][ycorn] = "X"
+        return "ok"
 
     # 8. Play on the empty side - if there is an empty side field, insert your mark here
     sides = ((0, 1), (1, 0), (1, 2), (2, 1))
+    sid = []
     for side in range(len(sides)):
         xside = sides[side][0]
         yside = sides[side][1]
         if fnboard[xside][yside] not in ("O", "X"):
-            fnboard[xside][yside] = "X"
-            return "ok"
+            sid.append(side)
+    if len(sid) > 0:
+        selected_side = randrange(len(sid))
+        xside = sides[sid[selected_side]][0]
+        yside = sides[sid[selected_side]][1]
+        fnboard[xside][yside] = "X"
+        return "ok"
 
     return
 
@@ -228,7 +240,6 @@ def win_alg(fnboard):  # Implementation of winning algorithm
 def draw_move(fnboard):  # Computer's move & board update
     if win_alg(fnboard) != "ok":
         print("random move")
-        from random import randrange
         free_fields = make_list_of_free_fields(fnboard)
         if len(free_fields) != 0:
             comp_move = randrange(len(free_fields))
