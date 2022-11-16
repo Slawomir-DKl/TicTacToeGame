@@ -40,18 +40,18 @@ def enter_move(fnboard):  # User's move & board update
                 fnboard[x][y] = "O"
                 break
             else:
-                chk = nofunct  # non-existing function to generate the ValueError
+                chk = nofunct  # non-existent function to generate the ValueError
         except ValueError:
             print("It is not an integer!")
         except NameError:
-            print("This square is occupied. Enter the number of empty square.")
+            print("This square is occupied. Enter the number of an empty square.")
         except ZeroDivisionError:
-            print("The number is not in the range from 1 to 9. Enter higher number.")
+            print("The number is not in the range from 1 to 9. Enter a higher number.")
         except IndexError:
-            print("The number is not in the range from 1 to 9. Enter lower number.")
+            print("The number is not in the range from 1 to 9. Enter a lower number.")
 
 
-def make_list_of_free_fields(fnboard):  # Building list of all the free squares
+def make_list_of_free_fields(fnboard):  # Building list of all free squares
 
     free = []
     for x in range(3):
@@ -110,8 +110,8 @@ def win_block(fnboard, xwin, owin):  # if there are two identically checked fiel
 def win_alg(fnboard):  # Implementation of winning algorithm
 
     # 1. Win
-    # If there is a row, column, or diagonal with two of my pieces and o blank space,
-    # Then ploy the blank space (thus winning the game).
+    # If there is a row, column, or diagonal with two of my pieces and a blank space,
+    # Then play the blank space (thus winning the game).
     if win_block(fnboard, 2, 0) == "ok":
         return "ok"
 
@@ -122,9 +122,9 @@ def win_alg(fnboard):  # Implementation of winning algorithm
         return "ok"
 
     # 3. Fork
-    # If there are two intersecting rows, columns, or diagonals with one of my pieces and two blonks, and
+    # If there are two intersecting rows, columns, or diagonals with one of my pieces and two blanks, and
     # If the intersecting space is empty,
-    # Then move to the intersecting space (thus creating two woys to win on my next turn).
+    # Then move to the intersecting space (thus creating two ways to win on my next turn).
     for triple in range(len(triples)):
         xfld, ofld = count_xo(fnboard, triple)
         if xfld == 1 and ofld == 0:  # first line with 1 computer mark and 0 user marks
@@ -142,10 +142,10 @@ def win_alg(fnboard):  # Implementation of winning algorithm
                                     return "ok"
 
     # 4. Block Fork
-    # If there are two intersecting rows, columns, or diagonals with one of my opponent’s pieces ond two blanks, and
+    # If there are two intersecting rows, columns, or diagonals with one of my opponent’s pieces and two blanks, and
     # If the intersecting space is empty,
     # Then
-        # If there is an empty location that creates a two-in-o-row for me
+        # If there is an empty location that creates a two-in-a-row for me
             # (thus forcing my opponent to block rather than fork),
         # Then move to the location.
         # Else move to the Intersection space (thus occupying the location that my opponent could use to fork).
@@ -222,7 +222,7 @@ def win_alg(fnboard):  # Implementation of winning algorithm
                 fnboard[xopp][yopp] = "X"
                 return "ok"
 
-    # 7. Ploy Empty Corner
+    # 7. Play Empty Corner
     # If there is an empty corner,
     # Then move to an empty corner.
     corn = []
